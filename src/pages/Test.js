@@ -1639,10 +1639,16 @@ script放在头部还是底部
 
 script defer async
 
+defer 延迟执行
+async 异步执行
+inline-script 不生效
+
 document.createElement
 
 使用 document.createElement 创建的 script 默认是异步的，示例如下。
 console.log(document.createElement("script").async); // true
+
+所以，通过动态添加 script 标签引入 JavaScript 文件默认是不会阻塞页面的。如果想同步执行，需要将 async 属性人为设置为 false。
 
 DOMContentLoaded | window.onload | document.ready
 */
