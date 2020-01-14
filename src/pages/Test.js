@@ -916,8 +916,6 @@ function Promise(executor) {
     }*/
 
 
-
-
   } catch (e) {
     reject(e);
   }
@@ -1266,7 +1264,7 @@ function Promise(excutor) {
   that.onRejectedCallbacks = []; // 存储rejected状态对应的onRejected函数
 
   function resolve(value) { // value成功态时接收的终值
-    if(value instanceof Promise) {
+    if (value instanceof Promise) {
       return value.then(resolve, reject);
     }
 
@@ -1346,19 +1344,19 @@ function resolvePromise(promise2, x, resolve, reject) {
       let then = x.then;
       if (typeof then === 'function') {
         then.call(x, y => {
-          if(called) return;
+          if (called) return;
           called = true;
           resolvePromise(promise2, y, resolve, reject);
         }, reason => {
-          if(called) return;
+          if (called) return;
           called = true;
           reject(reason);
         })
       } else { // 说明是一个普通对象/函数
         resolve(x);
       }
-    } catch(e) {
-      if(called) return;
+    } catch (e) {
+      if (called) return;
       called = true;
       reject(e);
     }
@@ -1373,7 +1371,7 @@ function resolvePromise(promise2, x, resolve, reject) {
  * @param  {function} onRejected  rejected状态时 执行的函数
  * @return {function} newPromsie  返回一个新的promise对象
  */
-Promise.prototype.then = function(onFulfilled, onRejected) {
+Promise.prototype.then = function (onFulfilled, onRejected) {
   const that = this;
   let newPromise;
   // 处理参数默认值 保证参数后续能够继续执行
@@ -1407,10 +1405,10 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
   if (that.status === FULFILLED) { // 成功态
     return newPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
-        try{
+        try {
           let x = onFulfilled(that.value);
           resolvePromise(newPromise, x, resolve, reject); // 新的promise resolve 上一个onFulfilled的返回值
-        } catch(e) {
+        } catch (e) {
           reject(e); // 捕获前面onFulfilled中抛出的异常 then(onFulfilled, onRejected);
         }
       });
@@ -1423,7 +1421,7 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
         try {
           let x = onRejected(that.reason);
           resolvePromise(newPromise, x, resolve, reject);
-        } catch(e) {
+        } catch (e) {
           reject(e);
         }
       });
@@ -1437,7 +1435,7 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
         try {
           let x = onFulfilled(value);
           resolvePromise(newPromise, x, resolve, reject);
-        } catch(e) {
+        } catch (e) {
           reject(e);
         }
       });
@@ -1445,7 +1443,7 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
         try {
           let x = onRejected(reason);
           resolvePromise(newPromise, x, resolve, reject);
-        } catch(e) {
+        } catch (e) {
           reject(e);
         }
       });
@@ -1459,7 +1457,7 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
  * 返回值: 返回一个Promise实例
  * 当这个数组里的所有promise对象全部变为resolve状态的时候，才会resolve。
  */
-Promise.all = function(promises) {
+Promise.all = function (promises) {
   return new Promise((resolve, reject) => {
     let done = gen(promises.length, resolve);
     promises.forEach((promise, index) => {
@@ -1473,7 +1471,7 @@ Promise.all = function(promises) {
 function gen(length, resolve) {
   let count = 0;
   let values = [];
-  return function(i, value) {
+  return function (i, value) {
     values[i] = value;
     if (++count === length) {
       console.log(values);
@@ -1488,7 +1486,7 @@ function gen(length, resolve) {
  * 返回值: 返回一个Promise实例
  * 只要有一个promise对象进入 FulFilled 或者 Rejected 状态的话，就会继续进行后面的处理(取决于哪一个更快)
  */
-Promise.race = function(promises) {
+Promise.race = function (promises) {
   return new Promise((resolve, reject) => {
     promises.forEach((promise, index) => {
       promise.then(resolve, reject);
@@ -1497,7 +1495,7 @@ Promise.race = function(promises) {
 }
 
 // 用于promise方法链时 捕获前面onFulfilled/onRejected抛出的异常
-Promise.prototype.catch = function(onRejected) {
+Promise.prototype.catch = function (onRejected) {
   return this.then(null, onRejected);
 }
 
@@ -1522,7 +1520,7 @@ Promise.reject = function (reason) {
  *参考jQuery.Deferred
  *url: http://api.jquery.com/category/deferred-object/
  */
-Promise.deferred = function() { // 延迟对象
+Promise.deferred = function () { // 延迟对象
   let defer = {};
   defer.promise = new Promise((resolve, reject) => {
     defer.resolve = resolve;
@@ -1541,4 +1539,114 @@ try {
   module.exports = Promise
 } catch (e) {
 }
+
+
+class Routers {
+  constructor() {
+    this.routes = {};
+    this.refresh = this.refresh.bind(this);
+    window.addEventListener('load', this.refresh, false);
+    window.addEventListener('popState', function (e) {
+      this.refresh(e.state.path), false
+    });
+  }
+
+  route(path, callback) {
+    history.pushState({path: path}, null, path);
+    this.routes[path] = callback || function () {};
+  }
+
+  refresh(path) {
+    this.routes[path]();
+  }
+}
+
+window.Router = new Routers();
+const content = document.querySelector('body');
+const ul = document.querySelector('ul');
+
+// change Page anything
+function changeText(text) {
+  content.innerHtml = text;
+}
+
+Router.route('/', function () {
+  changeText('yellow');
+});
+Router.route('/two', function () {
+  changeText('two');
+});
+Router.route('/three', function () {
+  changeText('three');
+});
+
+ul.addEventListener('click', e => {
+  if (e.target.tagName === 'A') {
+    e.preventDefault();
+    Router.go(e.target.getAttribute('href'));
+  }
+});
+
+
+//输入一个url之后发生了什么
+/*
+dns解析：当输入url之后，我们会去找到这个url对应的ip地址，ip地址就是每台服务器上的唯一标识，所以就能去找到对应的服务器，
+dns的匹配是一个递归的过程
+
+TCP连接  三次握手 四次挥手
+
+http连接（如果是https的话还有进行一个TLS/SSL握手，https虽然会更安全，但是握手和加密过程会耗费时间，即产生性能问题）
+
+http请求（即前端一直在讲的请求，请求响应）
+
+这里ajax有一个readyState的，和状态码是不一样的，返回状态码
+readyState属性：响应返回成功的时候得到通知。
+（1）0：请求未初始化，open还没有调用。
+（2）1：服务器连接已建立，open已经调用了。
+（3）2：请求已经接收，也就是接收到头信息了。
+（4）3：请求处理中，也就是接收到响应主体了。
+（5）4：请求已完成，且响应已就绪，也就是响应完成了。
+
+状态码是由3位数组成，第一个数字定义了响应的类别，且有五种可能取值:
+  1xx：指示信息–表示请求已接收，继续处理。
+2xx：成功–表示请求已被成功接收、理解、接受。
+3xx：重定向–要完成请求必须进行更进一步的操作。
+4xx：客户端错误–请求有语法错误或请求无法实现。
+5xx：服务器端错误–服务器未能实现合法的请求。
+平时遇到比较常见的状态码有:200, 204, 301, 302, 304, 400, 401, 403, 404, 422, 500(分别表示什么请自行查找)。
+
+这里会涉及到一个缓存的东西，没接触过，好像很复杂
+
+请求到html，css，js文件之后
+主渲染阶段
+
+html + css + js
+
+html
+css
+js
+
+页面的解析工作是在 Renderer 进程中进行的，Renderer 进程通过在主线程中持有的 Blink 实例边接收边解析 HTML 内容（图 6），
+每次从网络缓冲区中读取 8KB 以内的数据。浏览器自上而下逐行解析 HTML 内容，经过词法分析、语法分析，构建 DOM 树。
+当遇到外部 CSS 链接时，主线程调用网络请求模块异步获取资源，不阻塞而继续构建 DOM 树。当 CSS 下载完毕后，主线程在合适
+的时机解析 CSS 内容，经过词法分析、语法分析，构建 CSSOM 树。浏览器结合 DOM 树和 CSSOM 树构建 Render 树，并计算布局属性
+，每个 Node 的几何属性和在坐标系中的位置，最后进行绘制展示在屏幕上。当遇到外部 JS 链接时，主线程调用网络请求模块异步
+获取资源，由于 JS 可能会修改 DOM 树和 CSSOM 树而造成回流和重绘，此时 DOM 树的构建(和 CSSOM 树？)是处于阻塞状态的。但主线程并不会挂起
+，浏览器会使用一个轻量级的扫描器去发现后续需要下载的外部资源，提前发起网络请求，而脚本内部的资源不会识别，比如 document.write。
+当 JS 下载完毕后，浏览器调用 V8 引擎在 Script Streamer 线程中解析、编译 JS 内容，并在主线程中执行（图 7）。
+
+script放在头部还是底部
+
+script defer async
+
+document.createElement
+
+使用 document.createElement 创建的 script 默认是异步的，示例如下。
+console.log(document.createElement("script").async); // true
+
+DOMContentLoaded | window.onload | document.ready
+*/
+
+
+
 
