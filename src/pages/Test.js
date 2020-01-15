@@ -1635,12 +1635,27 @@ js
 ，浏览器会使用一个轻量级的扫描器去发现后续需要下载的外部资源，提前发起网络请求，而脚本内部的资源不会识别，比如 document.write。
 当 JS 下载完毕后，浏览器调用 V8 引擎在 Script Streamer 线程中解析、编译 JS 内容，并在主线程中执行（图 7）。
 
-script放在头部还是底部
+script应该放在底部，因为当去加载到js文件时，会阻塞到DOM tree（CSSOM tree?）的构建，所以应该放在html的底部影响dom的构建
 
 script defer async
 
-defer 延迟执行
-async 异步执行
+defer 延迟执行，等整个document解析完成后执行，载入js文件时不阻塞html的解析，即下面代码会按顺序执行
+
+<script src="app1.js" defer></script>
+<script src="app2.js" defer></script>
+<script src="app3.js" defer></script>
+
+async 属性表示异步执行引入的 JavaScript，与 defer 的区别在于，如果已经加载好，就会开始执行——无论此刻是 HTML 解析阶段还是
+DOMContentLoaded 触发之后。需要注意的是，这种方式加载的 JavaScript 依然会阻塞 load 事件。换句话说，async-script 可能在
+DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。即下面代码的执行顺序是不确定的
+
+<script src="app.js" async></script>
+<script src="ad.js" async></script>
+<script src="statistics.js" async></script>
+
+从上一段也能推出，多个 async-script 的执行顺序是不确定的。值得注意的是，向 document 动态添加 script 标签时，async 属性默认是 true，
+下一节会继续这个话题
+
 inline-script 不生效
 
 document.createElement
@@ -1648,9 +1663,14 @@ document.createElement
 使用 document.createElement 创建的 script 默认是异步的，示例如下。
 console.log(document.createElement("script").async); // true
 
-所以，通过动态添加 script 标签引入 JavaScript 文件默认是不会阻塞页面的。如果想同步执行，需要将 async 属性人为设置为 false。
+所以，通过动态添加 script 标签引入 JavaScript 文件默认是不会阻塞页面的。
+如果想同步执行，需要将 async 属性人为设置为 false。
 
 DOMContentLoaded | window.onload | document.ready
+
+DOMContentLoaded = document.ready  在dom加载完成后，会执行
+
+window.onload 所有资源加载完成后，会执行
 */
 
 
