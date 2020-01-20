@@ -1553,7 +1553,8 @@ class Routers {
 
   route(path, callback) {
     history.pushState({path: path}, null, path);
-    this.routes[path] = callback || function () {};
+    this.routes[path] = callback || function () {
+    };
   }
 
   refresh(path) {
@@ -1671,7 +1672,52 @@ DOMContentLoaded | window.onload | document.ready
 DOMContentLoaded = document.ready  在dom加载完成后，会执行
 
 window.onload 所有资源加载完成后，会执行
+
 */
+
+/*generator就是一个不断返回值的函数，一般函数只能返回一次
+
+举个例子*/
+
+/*function* outNumber(){
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+const a = outNumber();
+
+a.next();*/
+
+
+setTimeout(() => {
+  let a = 1;
+  a++;
+  setTimeout(() => {
+    console.log(a);
+  }, 2000)
+}, 1000)
+
+
+function* gen() {
+
+}
+
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    let a = 1;
+    a++;
+    resolve(a)
+  }, 1000)
+})
+
+
+promise.then((res) => {
+  setTimeout(() => {
+    console.log(res);
+  }, 2000)
+})
+
 
 
 
