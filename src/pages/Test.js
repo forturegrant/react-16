@@ -1046,11 +1046,7 @@ Promise.prototype.then = function (onFulfilled, onRejected) {
 
   if (that.status === PENDING) { // 等待态
     // 当异步调用resolve/rejected时 将onFulfilled/onRejected收集暂存到集合中
-    console.log('bbb');
-
-
     return newPromise = new Promise((resolve, reject) => {
-      console.log('ccc');
       that.onFulfilledCallbacks.push((value) => {
         try {
           let x = onFulfilled(value);
@@ -1718,6 +1714,23 @@ promise.then((res) => {
   }, 2000)
 })
 
+
+function Person(name) {
+  this.name = name;
+}
+
+Person.prototype = {
+  constructor: Person,
+  showName: function () {
+    console.log(this.name);
+  }
+}
+var person = new Person('qianlong');
+person.showName();
+
+/*//你好，我叫庄子鹏，今年24岁，17年开始上班，
+
+* */
 
 
 
