@@ -1686,7 +1686,7 @@ const a = outNumber();
 a.next();*/
 
 
-setTimeout(() => {
+/*setTimeout(() => {
   let a = 1;
   a++;
   setTimeout(() => {
@@ -1726,11 +1726,28 @@ Person.prototype = {
   }
 }
 var person = new Person('qianlong');
-person.showName();
+person.showName();*/
 
 /*//你好，我叫庄子鹏，今年24岁，17年开始上班，
 
 * */
+class Parent{
+  constructor(x,y){
+    this.x = x;
+    this.y = y;
+  }
+}
+
+class Child extends Parent{
+  constructor(x, y, color) {
+    super(x, y); // 调用父类的constructor(x, y)
+    this.color = color;
+  }
+
+  toString() {
+    return this.color + ' ' + super.toString(); // 调用父类的toString()
+  }
+}
 
 
 
